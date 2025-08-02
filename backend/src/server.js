@@ -12,12 +12,13 @@ import { connectDB } from "./lib/db.js";
 
 const app = express();
 const PORT = process.env.PORT;
+const FRONTEND_URI = process.env.FRONTEND_URI;
 
 const __dirname = path.resolve();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", FRONTEND_URI],
     credentials: true, // allow frontend to send cookies
   })
 );
