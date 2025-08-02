@@ -1,0 +1,179 @@
+TechStack: 
+Stream
+Backend- Node.js Express.js Mongodb
+Authentication - jWT
+Frontend- React.js (Custom Hooks using (React-Query) TANSTACK QUERY)
+Postman
+Vite-React
+/********************************************************************************************************************************************
+
+
+Code:
+
+*****
+/Backend
+
+**********
+/Backend/src
+1. Server.js
+ 
+ express: A web frame work.
+ app create to get, listen.
+ dotenv
+
+
+Routes folder created to handle each route page in a file seperately
+app.use() in Express
+app.use() is used to mount middleware or group routes with a common base path.
+
+
+*********************
+/Backend/src/routes/auth.route.js
+
+we created a router which handles all the routes
+router.post -> so that we can send some data (and not get method use)
+
+************************
+/Backend/src/controllers/auth.controller.js
+
+all the functions that we created in the auth.route.js file are defined here
+
+
+*token:
+Payload – { userId: newUser._id }
+This is the data stored inside the token.
+It’s what the backend can read later to identify the user.
+userId is usually the unique MongoDB _id of the user.
+2. Secret Key – process.env.JWT_SECRET_KEY
+This is a private key used to sign the token.
+It ensures that only your server can generate or verify tokens.
+It's stored in your .env file and should never be exposed to the client.
+3. Options – { expiresIn: "7d" }
+Sets the token expiration time.
+Here, the token will be valid for 7 days.
+
+*cookie:
+res.cookie("jwt", token, options)
+This tells Express to:
+Set a cookie named jwt
+Store the JWT token inside it
+Apply certain security settings (see below)
+
+*The user 
+*************
+/Backend/src/lib/db.js
+ we are connecting to mongodb using Connect()
+
+
+
+
+*************
+/Backend/src/models/User.js
+
+
+
+
+***********
+/Backend/src/middleware/auth.middleware.js
+
+
+
+This middleware checks if the user is authenticated by verifying the JWT token.
+If the token is valid, it allows access to protected routes.
+
+**************
+Database: Mongodb
+
+
+isonboarded: it ensures that user cannot access certain pages like /chat or /profile without being logged in
+friends: stores id of all the users(friends)
+
+we created a user schema which has all the fields that we need to store in the database
+and we created a model using that schema
+
+//pre hook (before saving the user to the database)
+salt:
+In bcrypt, a salt is a random string added to your password before hashing, to make each hash unique and more secure.
+Even if two users have the same password, their hashes will be different because the salt is different.
+
+
+
+**********************
+STREAM: 
+
+streamClient: With this we can create a client to connect to the Stream service.
+const streamClient = StreamChat.getInstance(process.env.STREAM_API_KEY, process.env.STREAM_API_SECRET);
+
+/**********************************************************************************************************************************8
+
+
+
+
+
+                                   KEYWORDS
+
+
+
+
+
+
+
+**************
+TANSTACK QUERY(React-Query): TanStack Query, formerly known as React Query, is a powerful data-fetching and caching library for frontend 
+applications, especially those built with React, Solid, Vue, Svelte, or Angular. It's designed to simplify server-state 
+management (i.e., data that lives on a remote server and needs to be fetched via an API).
+.
+🔧 What Does TanStack Query Do?
+Fetch data from APIs (REST, GraphQL, etc.)
+Cache responses automatically to avoid unnecessary requests
+Refetch data when needed (e.g., on window focus or network reconnect)
+Background updates to keep your UI up to date
+Pagination & infinite scrolling built-in
+Mutation support for POST, PUT, DELETE requests
+Devtools for debugging queries and cache
+
+
+**************
+
+
+
+
+
+
+/***********************************************************************************************************************************
+
+App Usage:
+
+A complete language exchange program with real time messaging  and video calling
+
+User's can practice a language through video calling
+
+It has Authentication System
+
+
+
+
+
+
+
+
+
+
+
+
+/***************************************************************************************************************************************
+
+Questions
+
+Express Basics
+
+1. What is the purpose of express.json() middleware?
+The express.json() middleware parses incoming JSON requests and makes the parsed data available in req.body.
+If a POST request sends:
+
+{ "username": "krishna", "password": "1234" }
+Then inside a route:
+
+console.log(req.body); 
+// Output: { username: 'krishna', password: '1234' }
+Without express.json(), req.body would be undefined.
