@@ -58,12 +58,12 @@ export async function signup(req, res) {
       secure: process.env.NODE_ENV === "production",
     });
 
-    try {
+   
+ try {
       await sendWelcomeEmail(email, fullName);
     } catch (error) {
       console.log("Failed to send welcome email:", error.message);
     }
-
     res.status(201).json({ success: true, user: newUser });
   } catch (error) {
     console.log("Error in signup controller", error);
