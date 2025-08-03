@@ -1,6 +1,7 @@
 import { upsertStreamUser } from "../lib/stream.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import sendWelcomeEmail from "../utils/utils.sendWelcomeEmail.js";
 
 export async function signup(req, res) {
   const { email, password, fullName } = req.body;
@@ -56,6 +57,12 @@ export async function signup(req, res) {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // prevent CSRF attacks
       secure: process.env.NODE_ENV === "production",
     });
+
+    try {
+      await sendWelcomeEmail(email, fullName);
+    } catch (error) {
+      console.log("Failed to send welcome email:", error.message);
+    }
 
     res.status(201).json({ success: true, user: newUser });
   } catch (error) {
