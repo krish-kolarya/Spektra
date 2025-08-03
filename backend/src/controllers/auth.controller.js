@@ -58,12 +58,6 @@ export async function signup(req, res) {
       secure: process.env.NODE_ENV === "production",
     });
 
-   
- try {
-      await sendWelcomeEmail(email, fullName);
-    } catch (error) {
-      console.log("Failed to send welcome email:", error.message);
-    }
     res.status(201).json({ success: true, user: newUser });
   } catch (error) {
     console.log("Error in signup controller", error);
@@ -116,7 +110,7 @@ export async function onboard(req, res) {
   try {
     const userId = req.user._id;
 
-    const { fullName, bio, nativeLanguage, learningLanguage, location } = req.body;
+    const { email, fullName, bio, nativeLanguage, learningLanguage, location } = req.body;
 
     if (!fullName || !bio || !nativeLanguage || !learningLanguage || !location) {
       return res.status(400).json({
@@ -151,6 +145,12 @@ export async function onboard(req, res) {
       console.log(`Stream user updated after onboarding for ${updatedUser.fullName}`);
     } catch (streamError) {
       console.log("Error updating Stream user during onboarding:", streamError.message);
+    }
+
+    try {
+      await sendWelcomeEmail(updatedUser.email, updatedUser.fullName);
+    } catch (error) {
+      console.log("Failed to send welcome email:", error.message);
     }
 
     res.status(200).json({ success: true, user: updatedUser });
