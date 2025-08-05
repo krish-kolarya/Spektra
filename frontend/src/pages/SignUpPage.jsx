@@ -1,5 +1,4 @@
 import { useState } from "react";
-//import { ShipWheelIcon } from "lucide-react";
 import { SparklesIcon } from "lucide-react";
 import { Link } from "react-router";
 
@@ -12,18 +11,6 @@ const SignUpPage = () => {
     password: "",
   });
 
-  // This is how we did it at first, without using our custom hook
-  // const queryClient = useQueryClient();
-  // const {
-  //   mutate: signupMutation,
-  //   isPending,
-  //   error,
-  // } = useMutation({
-  //   mutationFn: signup,
-  //   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-  // });
-
-  // This is how we did it using our custom hook - optimized version
   const { isPending, error, signupMutation } = useSignUp();
 
   const handleSignup = (e) => {
@@ -37,7 +24,31 @@ const SignUpPage = () => {
       data-theme="dark"
     >
       <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-5xl mx-auto bg-base-100 rounded-xl shadow-lg overflow-hidden">
-        {/* SIGNUP FORM - LEFT SIDE */}
+        
+        {/* IMAGE SIDE - LEFT */}
+        <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
+          <div className="max-w-md p-8">
+            {/* Illustration */}
+            <div className="relative aspect-square max-w-sm mx-auto">
+              <img
+                src="/i.png"
+                alt="Language connection illustration"
+                className="w-full h-full"
+              />
+            </div>
+            <div className="text-center space-y-3 mt-6">
+              <h2 className="text-xl font-semibold">
+                Connect with language partners worldwide
+              </h2>
+              <p className="opacity-70">
+                Practice conversations, make friends, and improve your language
+                skills together
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* FORM SIDE - RIGHT */}
         <div className="w-full lg:w-1/2 p-4 sm:p-8 flex flex-col">
           {/* LOGO */}
           <div className="mb-4 flex items-center justify-start gap-2">
@@ -80,7 +91,7 @@ const SignUpPage = () => {
                     <input
                       type="text"
                       placeholder="John Doe"
-                      className="input input-bordered w-full"
+                      className="input input-primary input-bordered w-full"
                       value={signupData.fullName}
                       onChange={(e) =>
                         setSignupData({
@@ -91,6 +102,7 @@ const SignUpPage = () => {
                       required
                     />
                   </div>
+
                   {/* EMAIL */}
                   <div className="form-control w-full">
                     <label className="label">
@@ -99,7 +111,7 @@ const SignUpPage = () => {
                     <input
                       type="email"
                       placeholder="john@gmail.com"
-                      className="input input-bordered w-full"
+                      className="input input-primary input-bordered w-full"
                       value={signupData.email}
                       onChange={(e) =>
                         setSignupData({ ...signupData, email: e.target.value })
@@ -107,6 +119,7 @@ const SignUpPage = () => {
                       required
                     />
                   </div>
+
                   {/* PASSWORD */}
                   <div className="form-control w-full">
                     <label className="label">
@@ -115,7 +128,7 @@ const SignUpPage = () => {
                     <input
                       type="password"
                       placeholder="********"
-                      className="input input-bordered w-full"
+                      className="input input-primary input-bordered w-full"
                       value={signupData.password}
                       onChange={(e) =>
                         setSignupData({
@@ -130,6 +143,7 @@ const SignUpPage = () => {
                     </p>
                   </div>
 
+                  {/* AGREEMENT */}
                   <div className="form-control">
                     <label className="label cursor-pointer justify-start gap-2">
                       <input
@@ -151,6 +165,7 @@ const SignUpPage = () => {
                   </div>
                 </div>
 
+                {/* SUBMIT BUTTON */}
                 <button className="btn btn-primary w-full" type="submit">
                   {isPending ? (
                     <>
@@ -172,30 +187,6 @@ const SignUpPage = () => {
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-
-        {/* SIGNUP FORM - RIGHT SIDE */}
-        <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
-          <div className="max-w-md p-8">
-            {/* Illustration */}
-            <div className="relative aspect-square max-w-sm mx-auto">
-              <img
-                src="/i.png"
-                alt="Language connection illustration"
-                className="w-full h-full"
-              />
-            </div>
-
-            <div className="text-center space-y-3 mt-6">
-              <h2 className="text-xl font-semibold">
-                Connect with language partners worldwide
-              </h2>
-              <p className="opacity-70">
-                Practice conversations, make friends, and improve your language
-                skills together
-              </p>
-            </div>
           </div>
         </div>
       </div>
