@@ -3,7 +3,7 @@ import useAuthUser from "../hooks/useAuthUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { completeOnboarding } from "../lib/api";
-import { LoaderIcon, MapPinIcon, SparklesIcon, ShuffleIcon } from "lucide-react";
+import { LoaderIcon, MapPinIcon, SparklesIcon, ShuffleIcon, CameraIcon} from "lucide-react";
 import { LANGUAGES } from "../constants";
 
 const OnboardingPage = () => {
@@ -38,11 +38,14 @@ const OnboardingPage = () => {
   };
 
   const handleRandomAvatar = () => {
-    const idx = Math.floor(Math.random() * 100) + 1; // 1-100 included
-    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+  const seed = Math.random().toString(36).substring(2, 10);
 
-    setFormState({ ...formState, profilePic: randomAvatar });
-    toast.success("Random profile picture generated!");
+  const randomAvatar =
+    `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`;
+
+  setFormState({ ...formState, profilePic: randomAvatar });
+
+  toast.success("Random profile picture generated!");
   };
 
   return (
