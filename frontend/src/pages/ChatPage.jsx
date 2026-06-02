@@ -37,13 +37,15 @@ const ChatPage = () => {
   });
 
   useEffect(() => {
+    let client;
+
     const initChat = async () => {
       if (!tokenData?.token || !authUser) return;
 
       try {
-        console.log("Initializing stream chat client...");
+        setLoading(true);
 
-        const client = StreamChat.getInstance(STREAM_API_KEY);
+        client = StreamChat.getInstance(STREAM_API_KEY);
 
         await client.connectUser(
           {
@@ -54,31 +56,37 @@ const ChatPage = () => {
           tokenData.token
         );
 
-        //
-        const channelId = [authUser._id, targetUserId].sort().join("-");
+        const channelId = [authUser._id, targetUserId]
+          .sort()
+          .join("-");
 
-        // you and me
-        // if i start the chat => channelId: [myId, yourId]
-        // if you start the chat => channelId: [yourId, myId]  => [myId,yourId]
-
-        const currChannel = client.channel("messaging", channelId, {
-          members: [authUser._id, targetUserId],
-        });
+        const currChannel = client.channel(
+          "messaging",
+          channelId,
+          {
+            members: [authUser._id, targetUserId],
+          }
+        );
 
         await currChannel.watch();
 
         setChatClient(client);
         setChannel(currChannel);
       } catch (error) {
-        console.error("Error initializing chat:", error);
-        toast.error("Could not connect to chat. Please try again.");
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
 
     initChat();
-  }, [tokenData, authUser, targetUserId]);
+
+    return () => {
+      if (client) {
+        client.disconnectUser();
+      }
+    };
+  }, [tokenData?.token, authUser?._id, targetUserId]);
 
   const handleVideoCall = () => {
     if (channel) {

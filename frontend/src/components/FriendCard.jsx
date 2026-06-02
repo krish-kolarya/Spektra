@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { LANGUAGE_TO_FLAG } from "../constants";
 
-const FriendCard = ({ friend }) => {
+const FriendCard = ({ friend, onClick, onRemove }) => {
   return (
     <div className="card bg-base-200 hover:shadow-md transition-shadow">
       <div className="card-body p-4">
@@ -27,6 +27,20 @@ const FriendCard = ({ friend }) => {
         <Link to={`/chat/${friend._id}`} className="btn btn-outline w-full">
           Message
         </Link>
+
+        
+        {onRemove && (
+          <button
+            className="btn btn-error btn-outline w-full mt-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+          >
+            Remove Friend
+          </button>
+        )}
+
       </div>
     </div>
   );

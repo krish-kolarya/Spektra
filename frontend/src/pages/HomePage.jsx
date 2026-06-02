@@ -5,6 +5,7 @@ import {
   getRecommendedUsers,
   getUserFriends,
   sendFriendRequest,
+  getFriendRequests
 } from "../lib/api";
 import { Link } from "react-router";
 import { CheckCircleIcon, MapPinIcon, UserPlusIcon, UsersIcon } from "lucide-react";
@@ -13,6 +14,8 @@ import { capitialize } from "../lib/utils";
 
 import FriendCard, { getLanguageFlag } from "../components/FriendCard";
 import NoFriendsFound from "../components/NoFriendsFound";
+
+import { useNavigate } from "react-router";
 
 const HomePage = () => {
   const queryClient = useQueryClient();
@@ -37,6 +40,19 @@ const HomePage = () => {
     mutationFn: sendFriendRequest,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["outgoingFriendReqs"] }),
   });
+
+  const { data: friendRequests } = useQuery({
+    queryKey: ["friendRequests"],
+    queryFn: getFriendRequests,
+  });
+
+  const incomingRequestIds = new Set(
+    friendRequests?.incomingReqs?.map(
+      (req) => req.sender._id
+    ) || []
+  );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const outgoingIds = new Set();
@@ -70,7 +86,7 @@ const HomePage = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
             {friends.map((friend) => (
-              <FriendCard key={friend._id} friend={friend} />
+              <FriendCard key={friend._id} friend={friend}/>
             ))}
           </div>
         )}
@@ -102,6 +118,7 @@ const HomePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {recommendedUsers.map((user) => {
                 const hasRequestBeenSent = outgoingRequestsIds.has(user._id);
+                const hasIncomingRequest = incomingRequestIds.has(user._id);
 
                 return (
                   <div
@@ -141,24 +158,30 @@ const HomePage = () => {
 
                       {/* Action button */}
                       <button
-                        className={`btn w-full mt-2 ${
-                          hasRequestBeenSent ? "btn-disabled" : "btn-primary"
-                        } `}
-                        onClick={() => sendRequestMutation(user._id)}
-                        disabled={hasRequestBeenSent || isPending}
-                      >
-                        {hasRequestBeenSent ? (
-                          <>
-                            <CheckCircleIcon className="size-4 mr-2" />
-                            Request Sent
-                          </>
-                        ) : (
-                          <>
-                            <UserPlusIcon className="size-4 mr-2" />
-                            Send Friend Request
-                          </>
-                        )}
-                      </button>
+                          className={`btn w-full mt-2 ${
+                            hasIncomingRequest
+                              ? "btn-warning"
+                              : hasRequestBeenSent
+                              ? "btn-disabled"
+                              : "btn-primary"
+                          }`}
+                          onClick={() => {
+                            if (hasIncomingRequest) {
+                              navigate("/notifications");
+                            } else {
+                              sendRequestMutation(user._id);
+                            }
+                          }}
+                          disabled={hasRequestBeenSent || isPending}
+                        >
+                          {hasIncomingRequest ? (
+                            "View Request"
+                          ) : hasRequestBeenSent ? (
+                            "Request Sent"
+                          ) : (
+                            "Send Friend Request"
+                          )}
+                        </button>
                     </div>
                   </div>
                 );

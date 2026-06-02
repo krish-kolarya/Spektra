@@ -3,6 +3,8 @@ import useAuthUser from "../hooks/useAuthUser";
 import { BellIcon, LogOutIcon, SparklesIcon } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
 import useLogout from "../hooks/useLogout";
+import { getFriendRequests } from "../lib/api.js";
+import { useQuery } from "@tanstack/react-query";
 
 const Navbar = () => {
   const { authUser } = useAuthUser();
@@ -16,6 +18,33 @@ const Navbar = () => {
   // });
 
   const { logoutMutation } = useLogout();
+
+  const { data: friendRequests } = useQuery({
+    queryKey: ["friendRequests"],
+    queryFn: getFriendRequests,
+  });
+
+  const notificationCount =
+  (friendRequests?.incomingReqs?.length || 0) +
+  (friendRequests?.acceptedReqs?.length || 0);
+
+  const notifications = [
+    ...(friendRequests?.incomingReqs || []).map((req) => ({
+      id: req._id,
+      type: "incoming",
+      user: req.sender.fullName,
+      createdAt: req.createdAt,
+    })),
+
+    ...(friendRequests?.acceptedReqs || []).map((req) => ({
+      id: req._id,
+      type: "accepted",
+      user: req.recipient.fullName,
+      createdAt: req.createdAt,
+    })),
+  ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const latestNotifications = notifications.slice(0, 5);
 
   return (
     <nav className="bg-base-200 border-b border-base-300 sticky top-0 z-30 h-16 flex items-center">
@@ -42,11 +71,54 @@ const Navbar = () => {
           )}
 
           <div className="flex items-center gap-3 sm:gap-4 ml-auto">
-            <Link to={"/notifications"}>
-              <button className="btn btn-ghost btn-circle">
-                <BellIcon className="h-6 w-6 text-base-content opacity-70" />
-              </button>
-            </Link>
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+                <div className="indicator">
+                  {notificationCount > 0 && (
+                    <span className="indicator-item badge badge-primary badge-xs -top-1 -right-1">
+                      {notificationCount}
+                    </span>
+                  )}
+
+                  <BellIcon className="h-6 w-6" />
+                </div>
+              </div>
+
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[100] menu p-2 shadow bg-base-200 rounded-box w-80 mt-2"
+              >
+                <li className="menu-title">
+                  <span>Notifications</span>
+                </li>
+
+                {latestNotifications.length === 0 ? (
+                  <li>
+                    <span>No notifications</span>
+                  </li>
+                ) : (
+                  latestNotifications.map((notification) => (
+                    <li key={notification.id}>
+                      <span>
+                        <strong>{notification.user}</strong>{" "}
+                        {notification.type === "incoming"
+                          ? "sent you a friend request"
+                          : "accepted your friend request"}
+                      </span>
+                    </li>
+                  ))
+                )}
+
+                <li>
+                  <Link to="/notifications">
+                    {notifications.length > 5
+                      ? `View all ${notifications.length} notifications`
+                      : "Open notifications"}
+                  </Link>
+                </li>
+              </ul>
+
+            </div>
           </div>
 
           {/* TODO */}
