@@ -37,7 +37,6 @@ const ChatPage = () => {
   });
 
   useEffect(() => {
-    let client;
 
     const initChat = async () => {
       if (!tokenData?.token || !authUser) return;
@@ -45,16 +44,23 @@ const ChatPage = () => {
       try {
         setLoading(true);
 
-        client = StreamChat.getInstance(STREAM_API_KEY);
+        
+        const client = StreamChat.getInstance(STREAM_API_KEY);
 
-        await client.connectUser(
-          {
-            id: authUser._id,
-            name: authUser.fullName,
-            image: authUser.profilePic,
-          },
-          tokenData.token
-        );
+        if (client.userID && client.userID !== authUser._id) {
+          await client.disconnectUser();
+        }
+
+        if (client.userID !== authUser._id) {
+          await client.connectUser(
+            {
+              id: authUser._id,
+              name: authUser.fullName,
+              image: authUser.profilePic,
+            },
+            tokenData.token
+          );
+        }
 
         const channelId = [authUser._id, targetUserId]
           .sort()
@@ -80,12 +86,6 @@ const ChatPage = () => {
     };
 
     initChat();
-
-    return () => {
-      if (client) {
-        client.disconnectUser();
-      }
-    };
   }, [tokenData?.token, authUser?._id, targetUserId]);
 
   const handleVideoCall = () => {
